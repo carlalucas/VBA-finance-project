@@ -1,0 +1,239 @@
+'Question 2'
+
+Sub reset_2()
+
+For i = 2 To 5
+
+    Worksheets(i).Activate
+    
+    j = 2
+    
+        Do While Cells(j, 2).Value <> ""
+        
+                If IsNumeric(Cells(j, 2).Value) = False Then
+                    Cells(j, 2).Value = Cells(j, 2).Value
+                End If
+                
+                j = j + 1
+            
+        Loop
+    
+Next i
+
+End Sub
+
+'Question 1'
+
+Sub reset_1()
+
+For i = 2 To 5
+
+    Worksheets(i).Activate
+    
+    j = 2
+        
+        Do While Cells(j, 2).Value <> ""
+            
+                If IsNumeric(Cells(j, 2).Value) = False Then
+                    Cells(j, 2).Value = (Cells(j - 1, 2).Value + Cells(j + 1, 2).Value) / 2
+                End If
+                    
+                j = j + 1
+            
+        Loop
+    
+Next i
+
+End Sub
+
+'Question 3'
+
+Sub Rendement_journalier()
+
+For i = 2 To 5
+
+    Worksheets(i).Activate
+    
+    Cells(1, 3).Value = "Rendement journalier"
+    
+    t = 3
+    
+        Do While Cells(t, 2).Value <> ""
+        
+                Cells(t, 3).Value = Cells(t, 2).Value / Cells(t - 1, 2).Value - 1
+                Cells(t, 3).NumberFormat = "0.00%"
+                    
+                t = t + 1
+            
+        Loop
+    
+Next i
+
+End Sub
+
+'Question 4'
+
+Function Rendement_cumulé(i As Integer) As Single
+
+Worksheets(i).Activate
+
+Rendement_cumulé = (Cells(2, 2).End(xlDown).Value / Cells(2, 2).Value) - 1
+
+End Function
+
+'Question 5'
+
+Sub Test_rendement_cumulé()
+
+Dim i As Integer
+
+For i = 2 To 5
+    
+    rc = Rendement_cumulé(i)
+    
+    Worksheets(1).Activate
+    
+    Cells(i + 2, 7).Value = rc
+    Cells(i + 2, 7).NumberFormat = "0.00%"
+
+Next i
+
+End Sub
+
+'Question 6'
+
+Sub Rendement_annualisé()
+
+Worksheets(1).Activate
+
+For i = 4 To 7
+
+    Cells(i, 8).Value = ((Cells(i, 7).Value + 1) ^ (1 / 5)) - 1
+    Cells(i, 8).NumberFormat = "0.00%"
+    
+Next i
+
+End Sub
+
+'Question 7'
+
+Sub Performance_annuelle()
+
+Worksheets(1).Activate
+
+Cells(3, 3).Value = 2022
+
+For a = 2019 To 2022
+
+    c = Range(Cells(3, 3), Cells(3, 6)).Find(a).Column
+
+    For i = 2 To 5
+    
+            Worksheets(i).Activate
+            
+                For l = 2 To Cells(2, 2).End(xlDown).Row
+                        
+                        If Year(Cells(l, 1)) = a Then
+                            debut = Cells(l - 1, 2).Value
+                            Exit For
+                        End If
+                
+                Next l
+            
+                For m = l To (Cells(l, 2).End(xlDown).Row + 1)
+                
+                        If Year(Cells(m, 1).Value) = a + 1 Or Cells(m, 1).Value = "" Then
+                            fin = Cells(m - 1, 2).Value
+                            Exit For
+                        End If
+                
+                Next m
+    
+            Worksheets(1).Activate
+            
+            Cells(i + 2, c).Value = (fin / debut) - 1
+            Cells(i + 2, c).NumberFormat = "0.00%"
+    Next i
+
+Next a
+
+Cells(3, 3).Value = "YTD"
+
+End Sub
+
+'Question 8'
+
+Function Volatilité_annualisée(i As Integer) As Double
+
+Worksheets(i).Activate
+
+sd = WorksheetFunction.StDev(Range(Cells(3, 3), Cells(3, 3).End(xlDown)))
+
+Volatilité_annualisée = Sqr(252) * sd
+
+End Function
+
+'Question 9'
+
+Sub Test_volatilitée_annualisée()
+
+Dim i As Integer
+
+For i = 2 To 5
+
+    Worksheets(i).Activate
+    
+    va = Volatilité_annualisée(i)
+    
+    Worksheets(1).Activate
+    
+    Cells(i + 2, 9).Value = va
+    Cells(i + 2, 9).NumberFormat = "0.00%"
+    
+Next i
+
+End Sub
+
+'Question 10'
+
+Sub Ratio_de_Sharpe()
+
+Worksheets(1).Activate
+
+For i = 4 To 7
+
+    Cells(i, 10).Value = (Cells(i, 8).Value - 0.003) / Cells(i, 9).Value
+    Cells(i, 10).NumberFormat = "0.00"
+    
+        If Cells(i, 10).Value > 1 Then
+            Cells(i, 10).Interior.Color = vbGreen
+        Else: Cells(i, 10).Interior.Color = vbYellow
+        End If
+    
+Next i
+
+End Sub
+
+'Question 11'
+
+Sub Beta()
+
+Worksheets(2).Activate
+b = Range(Cells(3, 3), Cells(3, 3).End(xlDown))
+volj = WorksheetFunction.StDev(b)
+
+For i = 5 To 7
+
+    Worksheets(i - 2).Activate
+    
+    a = Range(Cells(3, 3), Cells(3, 3).End(xlDown))
+    voli = WorksheetFunction.StDev(a)
+    
+    Worksheets(1).Activate
+
+    Cells(i, 11).Value = WorksheetFunction.Covar(a, b) / (voli * volj)
+    Cells(i, 11).NumberFormat = "0.00"
+    
+Next i
+
+End Sub
